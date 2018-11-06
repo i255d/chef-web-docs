@@ -1,53 +1,51 @@
 =====================================================
-log resource
+windows_share resource
 =====================================================
-`[edit on GitHub] <https://github.com/chef/chef-web-docs/blob/master/chef_master/source/resource_log.rst>`__
+`[edit on GitHub] <https://github.com/chef/chef-web-docs/blob/master/chef_master/source/resource_windows_share.rst>`__
 
-.. tag resource_log_summary
+Use the **windows_share** resource to create, modify and remove Windows shares.
 
-Use the **log** resource to create log entries. The **log** resource behaves like any other resource: built into the resource collection during the compile phase, and then run during the execution phase. (To create a log entry that is not built into the resource collection, use ``Chef::Log`` instead of the **log** resource.)
-
-.. note:: By default, every log resource that executes will count as an updated resource in the updated resource count at the end of a Chef run. You can disable this behavior by adding ``count_log_resource_updates false`` to your Chef ``client.rb`` configuration file.
-
-.. end_tag
+**New in Chef Client 14.7.**
 
 Syntax
 =====================================================
-.. tag resource_log_syntax
-
-A **log** resource block adds messages to the log file based on events that occur during the Chef Client run:
+The windows_share resource has the following syntax:
 
 .. code-block:: ruby
 
-   log 'message' do
-     message 'A message add to the log.'
-     level :info
-   end
-
-The full syntax for all of the properties that are available to the **log** resource is:
-
-.. code-block:: ruby
-
-  log 'name' do
-    level        Symbol # default value: info
-    message      String # default value: 'name' unless specified
-    action       Symbol # defaults to :write if not specified
+  windows_share 'name' do
+    ca_timeout                  Integer # default value: 0
+    change_users                Array
+    concurrent_user_limit       Integer # default value: 0
+    continuously_available      true, false # default value: false
+    description                 String
+    encrypt_data                true, false # default value: false
+    full_users                  Array
+    path                        String
+    read_users                  Array
+    scope_name                  String # default value: "*"
+    share_name                  String # default value: 'name' unless specified
+    temporary                   true, false # default value: false
+    action                      Symbol # defaults to :create if not specified
   end
 
 where:
 
-* ``log`` is the resource.
+* ``windows_share`` is the resource.
 * ``name`` is the name given to the resource block.
 * ``action`` identifies which steps the chef-client will take to bring the node into the desired state.
-* ``level`` and ``message`` are the properties available to this resource.
-
-.. end_tag
+* ``ca_timeout``, ``change_users``, ``concurrent_user_limit``, ``continuously_available``, ``description``, ``encrypt_data``, ``full_users``, ``path``, ``read_users``, ``scope_name``, ``share_name``, and ``temporary`` are the properties available to this resource.
 
 Actions
 =====================================================
-.. tag resource_log_actions
 
-The log resource has the following actions:
+The windows_share resource has the following actions:
+
+``:create``
+    Create and modify Windows shares.
+
+``:delete``
+    Delete an existing Windows share.
 
 ``:nothing``
    .. tag resources_common_actions_nothing
@@ -56,124 +54,70 @@ The log resource has the following actions:
 
    .. end_tag
 
-``:write``
-   Default. Write to log.
-
-.. end_tag
-
 Properties
 =====================================================
-.. tag resource_log_properties
 
-The log resource has the following properties:
+The windows_share resource has the following properties:
 
-``level``
-   **Ruby Type:** Symbol | **Default Value:** ``:info``
+``ca_timeout``
+   **Ruby Type:** Integer | **Default Value:** ``0``
 
-   The logging level for displaying this message.. Options (in order of priority): ``:debug``, ``:info``, ``:warn``, ``:error``, and ``:fatal``.
+   The continuous availability time-out for the share.
 
-``message``
+``change_users``
+   **Ruby Type:** Array
+
+   The users that should have 'modify' permission on the share in domain\username format.
+
+``concurrent_user_limit``
+   **Ruby Type:** Integer | **Default Value:** ``0``
+
+   The maximum number of concurrently connected users the share can accommodate.
+
+``continuously_available``
+   **Ruby Type:** true, false | **Default Value:** ``false``
+
+   Indicates that the share is continuously available.
+
+``description``
+   **Ruby Type:** String
+
+   The description to be applied to the share.
+
+``encrypt_data``
+   **Ruby Type:** true, false | **Default Value:** ``false``
+
+   Indicates that the share is encrypted.
+
+``full_users``
+   **Ruby Type:** Array
+
+   The users that should have 'Full control' permissions on the share in domain\username format.
+
+``path``
+   **Ruby Type:** String
+
+   The path of the folder to share. Required when creating. If the share already exists on a different path then it is deleted and re-created.
+
+``read_users``
+   **Ruby Type:** Array
+
+   The users that should have 'read' permission on the share in domain\username format.
+
+``scope_name``
+   **Ruby Type:** String | **Default Value:** ``"*"``
+
+   The scope name of the share.
+
+``share_name``
    **Ruby Type:** String | **Default Value:** ``'name'``
 
-   The message to be added to a log file. Default value: the ``name`` of the resource block. See "Syntax" section above for more information.
+   The name to assign to the share.
 
-.. end_tag
+``temporary``
+   **Ruby Type:** true, false | **Default Value:** ``false``
 
-Chef::Log Entries
-=====================================================
-.. tag ruby_style_basics_chef_log
-
-``Chef::Log`` extends ``Mixlib::Log`` and will print log entries to the default logger that is configured for the machine on which the Chef Client is running. (To create a log entry that is built into the resource collection, use the **log** resource instead of ``Chef::Log``.)
-
-The following log levels are supported:
-
-.. list-table::
-   :widths: 150 450
-   :header-rows: 1
-
-   * - Log Level
-     - Syntax
-   * - Fatal
-     - ``Chef::Log.fatal('string')``
-   * - Error
-     - ``Chef::Log.error('string')``
-   * - Warn
-     - ``Chef::Log.warn('string')``
-   * - Info
-     - ``Chef::Log.info('string')``
-   * - Debug
-     - ``Chef::Log.debug('string')``
-
-.. note:: The parentheses are optional, e.g. ``Chef::Log.info 'string'`` may be used instead of ``Chef::Log.info('string')``.
-
-.. end_tag
-
-.. tag ruby_class_chef_log_fatal
-
-The following example shows a series of fatal ``Chef::Log`` entries:
-
-.. code-block:: ruby
-
-   unless node['splunk']['upgrade_enabled']
-     Chef::Log.fatal('The chef-splunk::upgrade recipe was added to the node,')
-     Chef::Log.fatal('but the attribute `node["splunk"]["upgrade_enabled"]` was not set.')
-     Chef::Log.fatal('I am bailing here so this node does not upgrade.')
-     raise
-   end
-
-   service 'splunk_stop' do
-     service_name 'splunk'
-     supports status: true
-     action :stop
-   end
-
-   if node['splunk']['is_server']
-     splunk_package = 'splunk'
-     url_type = 'server'
-   else
-     splunk_package = 'splunkforwarder'
-     url_type = 'forwarder'
-   end
-
-   splunk_installer splunk_package do
-     url node['splunk']['upgrade']["#{url_type}_url"]
-   end
-
-   if node['splunk']['accept_license']
-     execute 'splunk-unattended-upgrade' do
-       command "#{splunk_cmd} start --accept-license --answer-yes"
-     end
-   else
-     Chef::Log.fatal('You did not accept the license (set node["splunk"]["accept_license"] to true)')
-     Chef::Log.fatal('Splunk is stopped and cannot be restarted until the license is accepted!')
-     raise
-   end
-
-The full recipe is the ``upgrade.rb`` recipe of the `chef-splunk cookbook <https://github.com/chef-cookbooks/chef-splunk/>`_ that is maintained by Chef.
-
-.. end_tag
-
-.. tag ruby_class_chef_log_multiple
-
-The following example shows using multiple ``Chef::Log`` entry types:
-
-.. code-block:: ruby
-
-   ...
-
-   begin
-     aws = Chef::DataBagItem.load(:aws, :main)
-     Chef::Log.info("Loaded AWS information from DataBagItem aws[#{aws['id']}]")
-   rescue
-     Chef::Log.fatal("Could not find the 'main' item in the 'aws' data bag")
-     raise
-   end
-
-   ...
-
-The full recipe is in the ``ebs_volume.rb`` recipe of the `database cookbook <https://github.com/chef-cookbooks/database/>`_ that is maintained by Chef.
-
-.. end_tag
+   The lifetime of the new SMB share. A temporary share does not persist beyond the next restart of the computer.
 
 Common Resource Functionality
 =====================================================
@@ -211,6 +155,7 @@ The following properties are common to every resource:
 
 Notifications
 -----------------------------------------------------
+
 ``notifies``
   **Ruby Type:** Symbol, 'Chef::Resource[String]'
 
@@ -320,46 +265,23 @@ The following properties can be used to define a guard that is evaluated during 
 .. end_tag
 
 Examples
-=====================================================
-The following examples demonstrate various approaches for using resources in recipes:
+==========================================
 
-**Set default logging level**
-
-.. tag resource_log_set_info
-
-.. To set the info (default) logging level:
+**Create a share**
 
 .. code-block:: ruby
 
-   log 'a string to log'
+  windows_share 'foo' do
+    action :create
+    path 'C:\\foo'
+    full_users ['DOMAIN_A\\some_user', 'DOMAIN_B\\some_other_user']
+    read_users ['DOMAIN_C\\Domain users']
+  end
 
-.. end_tag
-
-**Set debug logging level**
-
-.. tag resource_log_set_debug
-
-.. To set the debug logging level:
-
-.. code-block:: ruby
-
-   log 'a debug string' do
-     level :debug
-   end
-
-.. end_tag
-
-**Add a message to a log file**
-
-.. tag resource_log_add_message
-
-.. To add a message to a log file:
+** Delete a share **
 
 .. code-block:: ruby
 
-   log 'message' do
-     message 'This is the message that will be added to the log.'
-     level :info
-   end
-
-.. end_tag
+  windows_share 'foo' do
+    action :delete
+  end

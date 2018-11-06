@@ -1,53 +1,53 @@
 =====================================================
-log resource
+windows_firewall_rule resource
 =====================================================
-`[edit on GitHub] <https://github.com/chef/chef-web-docs/blob/master/chef_master/source/resource_log.rst>`__
+`[edit on GitHub] <https://github.com/chef/chef-web-docs/blob/master/chef_master/source/resource_windows_firewall_rule.rst>`__
 
-.. tag resource_log_summary
+Use the **windows_firewall_rule** resource to create, change or remove windows firewall rules.
 
-Use the **log** resource to create log entries. The **log** resource behaves like any other resource: built into the resource collection during the compile phase, and then run during the execution phase. (To create a log entry that is not built into the resource collection, use ``Chef::Log`` instead of the **log** resource.)
-
-.. note:: By default, every log resource that executes will count as an updated resource in the updated resource count at the end of a Chef run. You can disable this behavior by adding ``count_log_resource_updates false`` to your Chef ``client.rb`` configuration file.
-
-.. end_tag
+**New in Chef Client 14.7.**
 
 Syntax
 =====================================================
-.. tag resource_log_syntax
-
-A **log** resource block adds messages to the log file based on events that occur during the Chef Client run:
+The windows_firewall_rule resource has the following syntax:
 
 .. code-block:: ruby
 
-   log 'message' do
-     message 'A message add to the log.'
-     level :info
-   end
-
-The full syntax for all of the properties that are available to the **log** resource is:
-
-.. code-block:: ruby
-
-  log 'name' do
-    level        Symbol # default value: info
-    message      String # default value: 'name' unless specified
-    action       Symbol # defaults to :write if not specified
+  windows_firewall_rule 'name' do
+    description          String # default value: "Firewall rule"
+    direction            Symbol, String # default value: :inbound
+    enabled              true, false # default value: true
+    firewall_action      Symbol, String # default value: :allow
+    interface_type       Symbol, String # default value: :any
+    local_address        String
+    local_port           String
+    profile              Symbol, String # default value: :any
+    program              String
+    protocol             String # default value: "TCP"
+    remote_address       String
+    remote_port          String
+    rule_name            String # default value: 'name' unless specified
+    service              String
+    action               Symbol # defaults to :create if not specified
   end
 
 where:
 
-* ``log`` is the resource.
+* ``windows_firewall_rule`` is the resource.
 * ``name`` is the name given to the resource block.
 * ``action`` identifies which steps the chef-client will take to bring the node into the desired state.
-* ``level`` and ``message`` are the properties available to this resource.
-
-.. end_tag
+* ``description``, ``direction``, ``enabled``, ``firewall_action``, ``interface_type``, ``local_address``, ``local_port``, ``profile``, ``program``, ``protocol``, ``remote_address``, ``remote_port``, ``rule_name``, and ``service`` are the properties available to this resource.
 
 Actions
 =====================================================
-.. tag resource_log_actions
 
-The log resource has the following actions:
+The windows_firewall_rule resource has the following actions:
+
+``:create``
+    Create a Windows firewall entry.
+
+``:delete``
+    Delete an existing Windows firewall entry.
 
 ``:nothing``
    .. tag resources_common_actions_nothing
@@ -56,124 +56,80 @@ The log resource has the following actions:
 
    .. end_tag
 
-``:write``
-   Default. Write to log.
-
-.. end_tag
-
 Properties
 =====================================================
-.. tag resource_log_properties
 
-The log resource has the following properties:
+The windows_firewall_rule resource has the following properties:
 
-``level``
-   **Ruby Type:** Symbol | **Default Value:** ``:info``
+``description``
+   **Ruby Type:** String | **Default Value:** ``"Firewall rule"``
 
-   The logging level for displaying this message.. Options (in order of priority): ``:debug``, ``:info``, ``:warn``, ``:error``, and ``:fatal``.
+   The description to assign to the firewall rule.
 
-``message``
+``direction``
+   **Ruby Type:** Symbol, String | **Default Value:** ``:inbound``
+
+   The direction of the firewall rule. Direction means either inbound or outbound traffic.
+
+``enabled``
+   **Ruby Type:** true, false | **Default Value:** ``true``
+
+   Whether or not to enable the firewall rule.
+
+``firewall_action``
+   **Ruby Type:** Symbol, String | **Default Value:** ``:allow``
+
+   The action of the firewall rule.
+
+``interface_type``
+   **Ruby Type:** Symbol, String | **Default Value:** ``:any``
+
+   The interface type the firewall rule applies to.
+
+``local_address``
+   **Ruby Type:** String
+
+   The local address the firewall rule applies to.
+
+``local_port``
+   **Ruby Type:** String
+
+   The local port the firewall rule applies to.
+
+``profile``
+   **Ruby Type:** Symbol, String | **Default Value:** ``:any``
+
+   The profile the firewall rule applies to.
+
+``program``
+   **Ruby Type:** String
+
+   The program the firewall rule applies to.
+
+``protocol``
+   **Ruby Type:** String | **Default Value:** ``"TCP"``
+
+   The protocol the firewall rule applies to.
+
+``remote_address``
+   **Ruby Type:** String
+
+   The remote address the firewall rule applies to.
+
+``remote_port``
+   **Ruby Type:** String
+
+   The remote port the firewall rule applies to.
+
+``rule_name``
    **Ruby Type:** String | **Default Value:** ``'name'``
 
-   The message to be added to a log file. Default value: the ``name`` of the resource block. See "Syntax" section above for more information.
+   The name to assign to the firewall rule.
 
-.. end_tag
+``service``
+   **Ruby Type:** String
 
-Chef::Log Entries
-=====================================================
-.. tag ruby_style_basics_chef_log
-
-``Chef::Log`` extends ``Mixlib::Log`` and will print log entries to the default logger that is configured for the machine on which the Chef Client is running. (To create a log entry that is built into the resource collection, use the **log** resource instead of ``Chef::Log``.)
-
-The following log levels are supported:
-
-.. list-table::
-   :widths: 150 450
-   :header-rows: 1
-
-   * - Log Level
-     - Syntax
-   * - Fatal
-     - ``Chef::Log.fatal('string')``
-   * - Error
-     - ``Chef::Log.error('string')``
-   * - Warn
-     - ``Chef::Log.warn('string')``
-   * - Info
-     - ``Chef::Log.info('string')``
-   * - Debug
-     - ``Chef::Log.debug('string')``
-
-.. note:: The parentheses are optional, e.g. ``Chef::Log.info 'string'`` may be used instead of ``Chef::Log.info('string')``.
-
-.. end_tag
-
-.. tag ruby_class_chef_log_fatal
-
-The following example shows a series of fatal ``Chef::Log`` entries:
-
-.. code-block:: ruby
-
-   unless node['splunk']['upgrade_enabled']
-     Chef::Log.fatal('The chef-splunk::upgrade recipe was added to the node,')
-     Chef::Log.fatal('but the attribute `node["splunk"]["upgrade_enabled"]` was not set.')
-     Chef::Log.fatal('I am bailing here so this node does not upgrade.')
-     raise
-   end
-
-   service 'splunk_stop' do
-     service_name 'splunk'
-     supports status: true
-     action :stop
-   end
-
-   if node['splunk']['is_server']
-     splunk_package = 'splunk'
-     url_type = 'server'
-   else
-     splunk_package = 'splunkforwarder'
-     url_type = 'forwarder'
-   end
-
-   splunk_installer splunk_package do
-     url node['splunk']['upgrade']["#{url_type}_url"]
-   end
-
-   if node['splunk']['accept_license']
-     execute 'splunk-unattended-upgrade' do
-       command "#{splunk_cmd} start --accept-license --answer-yes"
-     end
-   else
-     Chef::Log.fatal('You did not accept the license (set node["splunk"]["accept_license"] to true)')
-     Chef::Log.fatal('Splunk is stopped and cannot be restarted until the license is accepted!')
-     raise
-   end
-
-The full recipe is the ``upgrade.rb`` recipe of the `chef-splunk cookbook <https://github.com/chef-cookbooks/chef-splunk/>`_ that is maintained by Chef.
-
-.. end_tag
-
-.. tag ruby_class_chef_log_multiple
-
-The following example shows using multiple ``Chef::Log`` entry types:
-
-.. code-block:: ruby
-
-   ...
-
-   begin
-     aws = Chef::DataBagItem.load(:aws, :main)
-     Chef::Log.info("Loaded AWS information from DataBagItem aws[#{aws['id']}]")
-   rescue
-     Chef::Log.fatal("Could not find the 'main' item in the 'aws' data bag")
-     raise
-   end
-
-   ...
-
-The full recipe is in the ``ebs_volume.rb`` recipe of the `database cookbook <https://github.com/chef-cookbooks/database/>`_ that is maintained by Chef.
-
-.. end_tag
+   The service the firewall rule applies to.
 
 Common Resource Functionality
 =====================================================
@@ -211,6 +167,7 @@ The following properties are common to every resource:
 
 Notifications
 -----------------------------------------------------
+
 ``notifies``
   **Ruby Type:** Symbol, 'Chef::Resource[String]'
 
@@ -320,46 +277,5 @@ The following properties can be used to define a guard that is evaluated during 
 .. end_tag
 
 Examples
-=====================================================
-The following examples demonstrate various approaches for using resources in recipes:
+==========================================
 
-**Set default logging level**
-
-.. tag resource_log_set_info
-
-.. To set the info (default) logging level:
-
-.. code-block:: ruby
-
-   log 'a string to log'
-
-.. end_tag
-
-**Set debug logging level**
-
-.. tag resource_log_set_debug
-
-.. To set the debug logging level:
-
-.. code-block:: ruby
-
-   log 'a debug string' do
-     level :debug
-   end
-
-.. end_tag
-
-**Add a message to a log file**
-
-.. tag resource_log_add_message
-
-.. To add a message to a log file:
-
-.. code-block:: ruby
-
-   log 'message' do
-     message 'This is the message that will be added to the log.'
-     level :info
-   end
-
-.. end_tag

@@ -47,7 +47,7 @@ This resource has the following actions:
 
 Properties
 =====================================================
-.. tag resource_breakpoint_attributes
+.. tag resource_breakpoint_properties
 
 This resource does not have any properties.
 
@@ -564,7 +564,7 @@ To get a list of nodes using a recipe named ``postfix`` use ``search(:node,"reci
 
 Examples
 =====================================================
-The following examples demonstrate various approaches for using resources in recipes. If you want to see examples of how Chef uses resources in recipes, take a closer look at the cookbooks that Chef authors and maintains: https://github.com/chef-cookbooks.
+The following examples demonstrate various approaches for using resources in recipes:
 
 **A recipe without a breakpoint**
 
