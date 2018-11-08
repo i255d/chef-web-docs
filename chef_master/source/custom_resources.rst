@@ -23,6 +23,10 @@ Syntax
 =====================================================
 .. tag custom_resources_syntax
 
+.. note:
+To generate the /resource directory in your cookbook, from a prompt within the cookbooks name, run 'chef generate resource [name_of_custom_resouce]'.
+This will create a '/coobookname/resource/name_of_custom_resouce.rb', directory and rb file.  Or, manualy create the directroy and rb file.  
+
 A custom resource is defined as a Ruby file and is located in a cookbook's ``/resources`` directory. This file
 
 * Declares the properties of the custom resource
